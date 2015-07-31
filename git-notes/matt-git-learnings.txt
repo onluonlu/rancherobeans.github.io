@@ -1,0 +1,910 @@
+High Level Notes
+
+	git is a Version Control System (VCS) - best at tracking changes in text documents
+
+	Source Code Management (SCM) - using a VCS for the purposes of managing source code
+
+	concurrent Version System (CVS) - was prior to other subsequent VSCs and Git. Users loaded a master repository to a remote server, then changes would be submitted back to the central repo (it’s up to users to keep up to date/pull down whatever is being changed in that central repo)
+
+	bitKeeper SCM was a closed-source VCS, introduced distributed version control
+
+	git was created by Linus Torvald once BitKeeper stopped being free
+
+	distributed version control
+
+		different users maintain their own repositories
+
+		changes are stored as “change sets” or “patches” - this is different from a CVS system because they are modular and can be applied independently. A CVS system simply tracks changes that it takes to move from one version to another (stacked on top of each other). Distributed version control tracks changes, not versions
+
+		many working copies (repos), each with their own combination of change sets. There actually is no centrally stored master repo. Instead, a master repo is designated by someone and select changes can be applied to that repo if that person wishes to do so.
+
+		HEAD repo is the most up to date where change sets are applied. Looking at the code at a previous commit point actually shows the inverse of the change set - essentially going back in time.
+
+		benefits
+
+			no need to communicate with a central server
+
+			faster
+
+			no network access required as the repo is local - changes can be submitted later
+
+			no single failure point. So if a master repo on a non git VCS failed, people working on that would be in trouble as their versions wouldn’t line up
+
+			encourages forking and changes shared between forked projects and/or the designated master
+
+	three-tree architecture vs. two tree
+
+		two-tree
+
+			working copy and repo - changes made to the working copy are committed to the repo
+
+		three-tree
+
+			working copy, staging index and repo - changes made to the working copy are staged and then committed to repo. Allows for only specified changes from the working copy to be staged and then committed. So changes the dev is not ready to commit to repo don't have to be committed, but others can. Works same way when pulling from repo. Usually, all changes from repo are pulled without staging though.
+
+	checksum
+
+		git uses a checksum algorithm to convert data into a simple number.
+
+		same data would create the same checksum, thus indicating no changes. But when checksum is run again on a file, new SHA-1 "hash" algorithm is created (40 character hexadecimal string - 0-9, a-f). ex. 5f83b28f091bd1dce9ecddc2af7dd870796eec89
+
+		one checksum can refer to a parent snapshot checksum with author and message
+
+		current checksum is referenced in HEAD file in .git. Actual checksum is stored in .git/refs/heads/master
+
+		using git status is the basic way to display what the status is between the three git branches
+
+	HEAD
+
+		refers to tip of current branch in repo (the latest commit)
+
+		HEAD always points to the latest commit (tip) of the currently checked out branch
+
+		there is a file called HEAD in the .git folder of each git
+
+		a new file is only tracked after it has been committed at least once
+
+Working in Terminal
+
+	go to main user directory: cd ~
+
+	go to GitHub folder (next level down file after that): cd github
+
+	jump back up a level to main user directory: cd ..
+
+
+
+Working With Git
+
+	setting configurations
+
+		scope
+
+			system
+
+				git config —system
+
+			user
+
+				git config —local
+
+			project
+
+				git config
+
+	use
+
+		set user config
+
+			set user name for git: git config --global user.name "rancherobeans"
+
+			set user email: git config --global user.email "rancherobeans@gmail.com"
+
+		check user config settings
+
+			check all global settings for user: git config --list
+
+			check specific configuration: git config user.name
+
+			to show contents of a file (.gitconfig for example): cat .gitconfig
+
+		configure git - set default text editor
+
+			git config --global core.editor "Sublime Text 2 -wl1"
+				*note, -w tells git to pause what it's doing to wait for text to be entered, and l1 tells it to start at line 1
+
+		show directory listing and all hidden files
+
+			ls -la (ls alone shows only non hidden files)
+
+			drive deeper ex: ls -la .git
+
+		install autocomplete for git
+
+			visit the following and follow directions to install via Homebrew: https://github.com/bobthecow/git-flow-completion/wiki/Install-Bash-git-completion
+
+		use git help
+
+			some commands
+
+				see list of most used commands: git help
+
+				manual for git log: hit help log
+
+					in multi page manuals like this, navigate:
+
+						move forward a page: f
+
+						move back: b
+
+						quit: q
+
+		creating a new git
+
+			add folder in finder or mkdir [folder name]
+
+			navigate to folder in terminal, type git init (.git folder will be placed into that folder)
+
+			make changes to the folder (like adding new files)
+
+			stage changes: git add . (the . refers to "this directory")
+
+			commit changes: git commit -m "Initial commit"
+
+		creating a new git and adding to GitHub
+
+			Create new repo from within GitHub
+
+			copy clone URL from within GitHub, then go into terminal and clone empty repo onto local machine
+
+				git clone [URL]
+
+			add desired files inside of repo, stage, commit and push as desired
+
+
+		about commit messages
+
+			should describe changes being made to commit set, be less than 50 characters for single line and 72 for subsequent multi lines, in present tense (ex. "fixes a bug"), asteriks or hyphens for bullet points, can add ticket or tracking numbers, can develop shorthand for your own organization (add to wiki), be clear and descriptive - what was the typo?, don't add comments that are email-like (something that communicates personal messages to team members). Good message - "t23094 - Fixes bug in admin logout", is good because references ticket and describes what was wrong and how it's fixed
+
+		about git log - ex. to see all that has been changed in a project
+
+			command to see all commits: git log
+
+			to see just a few: git log -n 5
+
+			or since a date: git log --since=2015-07-26
+
+			or up until a date: git log --until=2015-07-14
+
+				can use since and until together
+
+			to search for a particular author: git log --author="Joe"
+
+			search within people's commit messages: git log --grep="Init"
+
+				grep stands for global regular expression search - ex. if our org has decided upon a certain nomenclature for communication, can search based on that
+
+		basic add workflow
+
+			see what is or is not staged: git status
+
+			add files to staging: git add file.txt
+
+				can add everything at once: git add .
+
+				can stack files: git add file.txt file2.txt file 3.txt
+
+
+			commit file to repo: git commit -m "Message"
+
+		see changes - repo vs. working diretory and files
+
+			compare: git diff
+
+		see changes - staged vs. working directory and files
+
+			compare: git diff --staged
+
+
+		delete files
+
+			deleting already committed files from the finder
+
+				git status will show that they have been delted
+
+					now stage delete from the repo: git rm [file name]
+
+						commit ex.: git commit -m "deleted"
+
+			do whole remove from git (danger, uses a unix remove, not let's put things in the trash remove)
+
+				git rm [file name]
+
+					git status will show that file has been deleted and is in staging area
+
+						commit
+
+			move and rename files
+
+				do in operating system, stage, commit
+
+					note, git status will show a deleted file and then an untracked file (with the new name)
+
+					add new file
+
+					delete old file
+
+					commit
+
+				do within git (better)
+
+					git mv second_file.txt secondary_file.txt
+
+						commit
+
+				move a file
+
+					git mv secondary_file.txt nestedDirectory/secondary_file.txt
+
+						commit
+
+		add file locally and make into a git
+
+			switch to directory
+
+			git init
+
+			git status to see all untracked files
+
+			commit
+
+		back to thinking about tracking changes
+
+			show all changes
+
+				git diff contact.html
+
+				f or space to move forward a page
+
+				b to move back
+
+				when within a page, toggle between text wrape: - [shift] s
+
+					can also be set within the config file
+
+			show only what was changed as a color coded text snipped (better)
+				git diff --color-words contact.html
+
+
+		stage and commit all in one big move (danger, grabs everything in the working directory, also, files not tracked or files being deleted it doesn't include them)
+
+			git commit -am "changed 24 hour support number to 4314"
+
+		practice renaming a file
+
+			git mv tours/tour_detail_backpack.html tours/tour_detail_backpack.cal.html
+
+			git status
+
+			change all instances of links to old page to new page
+
+				in sublime text 2, find all "_backpack" and change to "_backpack_cal"
+
+		bifurcate commits
+
+			stage the first set to be committed, then commit, then repeat
+
+		reverting changes to a file, not a branch (restoring repo version of a file)
+
+			git diff
+
+			git checkout -- index.html
+
+		undo changes to staging area
+
+			git reset HEAD resources.html
+
+		undo commits
+
+			you don't actually want to do this because this messes with the data integrety - theoretically, doing this in a previous commit would require all SHA hash to be changed.
+
+			but, changing/overwriting the most recent commit is fine.
+
+				revert change in working file
+
+				stage
+
+				overwrite previous commit: git commit --amend -m "[new or previous message]"
+
+					note, this changes the SHA hash (thus, only have ability to edit the most recent commit)
+
+		revert to an old commit by reverting to a previous commit (record mistake, record fix)
+
+			copy SHA from a previous commit
+
+			git checkout 2b62523fafc91b985e50a00dc6e202271868b430 -- resources.html
+
+				note, the -- makes sure git knows I'm talking about a file, not a branch
+
+				doing the checkout will revert to the specified commit and stage
+
+				best practice when doing this is to refer to the SHA I reverted to in this newest commit - ex. "reverting to previous commit 2b62523fafc91b985e50a00dc6e202271868b430"
+
+		revert the latest commit entirely to be like the one previous to it (like an undo)
+
+			copy SHA from previous commit
+
+			git revert 29f529fd5e33320fa1c92363dee52b920ef2c95f
+
+				Sublime Text 2 will open. change comment if necessare, save, close. done.
+
+		undo multiple commits (use with extreme caution). Basically done by pointing HEAD pointer somewhere else previous. note, always good to git log and then copy and paste a whole set of the latest commits into a text document elsewhere
+
+			notes about git reset:
+
+				--soft: moves pointer but doesn't change staging index or working directory
+
+					can make a new commit to overwrite from that point
+
+					or, because this is non destructive, if the SHAs before the head point move have been recorded elsewhere, you can
+
+						git reset --soft 337c8e6ae5f8a52372e599db4ae14122f45c04ef
+
+						after committing, the change is made. But the reset can be undone buy
+
+							git reset --soft [previous SHA that was copied and pasted into text doc]
+
+				--mixed: moves pointer but changes staging index. Does not change working directory
+
+					changes in working document are unstaged and need to be committed again, but they are still present in working doc itself
+
+					if not committed, can be reverted by [previous SHA that was copied and pasted into text doc]
+
+						git reset --mixed
+
+				--hard: moves pointer and changes both staging index and working directory to match repo at that new HEAD point
+
+					git reset --hard
+
+						can still revert if I first recorded the SHAs
+
+		remove untracked files
+
+			git clean -n: is a test run to show you what would be removed
+
+			git clear -f: actually runs it
+
+		set things to be ignored by git (.gitignore)
+			inside of the project folder
+
+				make a file that will indicate what is to be ignored or not
+
+					nano .gitignore
+
+					add the names and extensions of files to be ignored. Things like
+
+						compile source code that depends upon computer processor and would need to be recompiled on another machine
+
+						packages and compressed files
+
+						logs and databases
+
+						operating system generated files
+
+						user uploaded assets (images, PDFs, videos)
+
+					ad # to make comments or to comment out something
+
+					Can specify what should and should not be ignore (note, ! indicates and exception)
+
+						tempfile.txt
+						.DS_store
+						*.zip
+						*.gz
+						log/*.log
+						log/*.log.[0-9]
+						assets/photoshop/
+						assets/videos/
+						!assets/videos/tour_*.mp4
+
+			globally ignoring files
+
+				create the global .gitignore file:
+
+					navigate to desired folder and enter: nano .gitignore_global
+
+					add desired things to be ignored
+
+					reference this new file in git config: git config --global core.excludesfile ~/.gitignore_global
+
+
+			ignore already tracked files (not new files) - note, adding a file or file type to the .gitignore will not unfollow an already tracked file. So:
+
+				for example, if I've told .gitignore to ignore all .txt files, but there is already a .txt being tracked, any changes to it will continue to be tracked. I can remove it from the staging index (not the repo) so that it will no longer be tracked and thus will be ignored:
+
+					git rm --cached tempfile2.txt
+
+			tracking empty folders
+
+				quick cheat: add some random text file caled .gitkeep in there
+
+				make one from within unix: touch assets/pdfs/.gitkeep
+
+
+			navigate the commit tree (like a directory in a file system) - "tree-ish" - a reference to a commit
+
+				like full or short SHA-1 hash
+
+				the HEAD pointer
+
+				branch reference, tag reference
+
+				ancestry
+
+				parent, grandparent and great-grandparent commit
+
+					HEAD~1
+					HEAD~2
+					HEAD~3
+
+				see git help for ls-tree
+
+				see files inside the repository at that point
+
+					git ls-tree HEAD
+
+						note, this may show fewer files than in actual directory as there may be a .gitignore there
+
+				see files inside a specific folder at that point
+
+					git ls-tree master assets/
+
+				see that same folder, but one commit back
+
+					git ls-tree master^ assets/
+
+				notice that files are tagged with blob and folders tagged with tree
+
+				look inside of any tree (folder)
+
+					git ls-tree [SHA hash, like e69de29bb2d1d6434b8b29ae775ad8c2e48c5391]
+
+		getting more from the commit log
+
+			normal command is git log
+
+			see one line list of git log items: git log --oneline
+
+				or, show the full SHA with
+
+					git log --format=oneline
+
+				show only a certain number of one line commits: git log --oneline -5
+
+				since and until
+
+					git log --since="2015-03-03"
+					git log --until="2015-05-25"
+
+						note, can be combined with --oneline
+
+			see any commits with a keyword
+
+				git log --grep="keyword"
+
+			see range of commits between two SHAs
+
+				git log [SHA code or part of SHA 1]..[whole or part SHA 2] --oneline
+
+			see the logs for any commits that effect a certain file since a certain commit
+
+				select whole or part SHA
+
+				type: git log 598a4fc.. index.html
+
+			see commits for a certain file
+
+				git log index.html
+
+			find out more details about the commits
+
+				git log -p
+
+					can apply -p to certain SHAs for files and/or files
+
+						git log -p 598a4fc.. index.html
+
+						git log -p index.html
+
+			find stats about commits
+
+				git log --stat --summary (can use them together or separateyl)
+
+			different ways to pull log info/formats
+
+				git log --format=
+
+					short
+					medium
+					full
+					fuller
+					email
+
+			show graph stats
+
+				git log --graph
+
+			good combination of git log display methodologies
+
+				git log --oneline --graph --all --decorate
+
+			see what was changed inside a specific commit
+
+				git show [SHA]
+
+				git show --format=oneline HEAD
+				git show --format=oneline HEAD^ (for back one commit from HEAD)
+				git show --format=oneline HEAD^^ (for back 2)
+
+				note, git show can handle other things than just commits.
+
+					see help: git help show
+
+					show contents of a tree, or a file
+
+						tree
+
+							git ls-tree master
+
+							grab a SHA
+
+							git show [SHA]
+
+						file
+
+							grab a SHA
+
+							git show [SHA]
+
+			compare commits (the directory snapshot)
+
+				compare working directory and a previous commit
+
+					git log --oneline
+
+					choose a SHA, then again
+
+					git diff 8324269..d28b5bb
+
+					or, compare against the HEAD
+
+						git diff d28b5bb..HEAD
+
+					or, between the head and grand parent
+
+						git diff HEAD^^
+
+					adding some stat and summary into the compare
+
+						git log --oneline
+
+						choose SHA from near the beginning/initial commit
+
+						git diff --stat --summary 7c42a71..HEAD
+
+							add -b to ignore white space changes
+
+							add -w to ignore all spaces
+		branches
+
+			are cheap, good for trying out new ideas, isolating features or section sof work, easily swappable to jump in and out of branches
+
+			merging in a new branch creates a new commmit
+
+			currently checked out branch: git branch
+
+				shows all branches and and asteriks next to the curently selected branch
+
+				for fun, see where the SHA of the current head is stored
+
+					from within the directory of the local repo, cat .git/HEAD
+
+					contents of that file are shown as: ref: refs/heads/master (this is pointing to another folder with a text file where the SHA is stored)
+
+					cat .git/refs/heads/master will show the contents of that file, which is the SHA of the currently selected HEAD
+
+				create a new branch
+
+					git branch [branch names]
+
+					check to make sure branch was created: git branch
+
+					see file where the references to all branches are stored
+
+						ls -la .git/refs/heads
+
+				switch to a new branch
+
+					git checkout [desired branch]
+
+						note, original commit on previous branch is still where the HEAD lies until a new commit has been created
+
+					changes can be made to a file on one branch and will not be present anymore on the other branch
+
+				create and switch to a new branch
+
+					git checkout -b shorten_title
+
+						note, the branch is started from the currently selected branch which may be different from master and/or other branches
+
+				see differences between a couple branches
+
+					git diff --color-words [branch 1]..[branch 2]
+
+						note, these branches are tree-ish, so I can add ^ to compare previous versions of them. ex:
+
+							git diff --color-words [branch 1]..[branch 2]^
+
+				from within a branch, see what other branches commits are completely merged in
+
+					from within the shorten_title branch, git branch --merged
+
+					you can compare based on that
+
+				rename a branch
+
+					git branch -m [old branch title] [new branch title]
+
+				delete a branch
+
+					git branch -d branch_to_delete
+
+					for branches that already have commits use -D
+
+				configure command prompt to show us the current branch
+
+					change command prompt to show whatever I want: export PS1='[stuff here]'
+
+					configure terminal to always show just a ~ and the branch name (if present)
+
+						from user directory ~, nano .bash_profile
+
+						add the following to the bottom: export PS1='\W$(__git_ps1 "(%s)") > '
+
+		merging branches
+
+			checkout receiving branch, then pull from sending branch: git merge sending_branch
+
+			note, if master branch and another branch are asked to merge, a fast-forward merge is created which essentially moves the commit from the other branch ahead of the master branch's head.
+
+				if want to force a real merge (to create a new commit/SHA): git merge --no-ff branch
+
+
+				if you want the merge to happen only if a fast-forward can happen (the items must be the same): git merge --ff-only_branch
+
+			fixing merge conflicts
+
+				git will mark problems for me. git status to see what file in question if needed
+
+				look at file, >>>>>HEAD will show what is in the head. That info ends with =====. between that and >>>>>>branch_name will be the other part of the conflict
+
+				to abort the merge conflict: git merge --abort
+
+				to fix the conflict manually, go into file and fix accordingly, then remove the git notations
+
+				then stage the changes
+
+				commit, but don't have to put a message: git commit
+
+				see graphical representation of merge: git log --graph --oneline --all --decorate
+
+				tips to avoid conflicts:
+
+					keep lines short
+
+					keep commits small and focused
+
+					beware stray edits to whitespace (spaces, tabs, line returns)
+
+					merge often
+
+					track changes to master by merging master into a branch often
+
+		Stashing changes
+
+			stashes are still a snapshot, but not a commit and thus don't have a SHA
+
+			stashing something will remove it as a non staged change to a file
+
+			They let you jump into another branch without having to abort any changes you've made to your files
+
+			command is: git stash save "[comment about the stash here]"
+
+			see list of things in the stash: git stash list
+
+			syntax for which the shashes are referred to is: stash@{0} [note, the number will change as new stashes are added]
+
+			stashes are available across branches
+
+			see what was changed in stash: git stash show -p stash@{0}
+
+			pull items out of the stash (if you don't specify which stash it automatically pulls the first one)
+
+				git stash pop stash@{0} (also removes it from the stash)
+
+				git stash apply stash@{0} (leaves a copy of the stash - for example, applying a change onto different branches)
+
+			unstash something
+
+				git stash save "[comment]"
+
+
+			delete stash
+
+				single item: git stash drop [stash ref]
+
+				whole stash set: git stash clear
+
+		working with Remotes
+
+			git creates an origin/master branch on our local machine that references the master branch and tries to stay in sync with it. With this tracked origin/master branch, changes that we push to the remote are then sent back our way to align the origin/master branch. We fetch changes from other people and this updates the origin/master branch. It doesn't bring it into ourmaster branch though until we do a merge.
+
+			create git using github
+
+				create repo on github
+
+				clone onto local machine
+
+					note, you can change the folder name of the local repo and it doens't hurt anythign
+
+				drop desired files inside
+
+				***push each desired branch: git push -u [alias] [branch]
+
+					note, the "-u" is very important because it makes sure the branch being pushed is set up to track the remote branch version of itself
+
+					note, alias should usually be the default "origin"
+
+					note, you can see all local and remote branches is a list: git branch -a
+
+				to verify that a branch is a tracking branch: cat. git/config
+
+					the "[branch "master"] title will have
+
+						remote = origin
+						merge = refs/heads/master
+
+					the "[remote "origin"] title will have
+
+						fetch = +refs/heads/*:refs/remotes/origin*
+						url = [URL from github]
+
+				to add a non-tracked branch to be tracked (for a branch named seo_title for example)
+
+					git config branch.seo_title.remote origin
+
+					git config branch.seo_title.merge refs/heads/master
+
+					then check the config file to verify it is now listed with the other branches: cat .git/config
+
+				push changes to a remote repo
+
+					git push
+
+					git push [alias] [branch]
+
+
+				fetch changes from a remote repo
+
+					a user needs to do this in order to see the new commits on the remote repo (updates our origin/master)
+
+						git fetch
+
+							note, this fetches the changes and places them onto the origin/master (not onto any of my branches)
+
+							note, fetch before you work, before you push, and do it all often
+
+				merge fetched changes
+
+					git merge origin/master
+
+					use git pull (git pull = git fetch + git merge)
+
+				check out remote branches (pull in remote branches)
+
+					We can't actually copy the branch and all its history, but we can start a new branch based on it.
+
+					first, double check to see what remote branches look like: git branch -r
+
+					decide which branch to copy
+
+					git branch [branch] origin/[branch]
+
+						add -b before first branch name to both add and checkout
+
+				pushing update to remote branch
+
+					if someone has first made changes to the remote branch, need to merge with origin/master first
+
+				deleting a remote branch
+
+					git push [alias] :[branch]
+
+					or
+
+					git push origin --delete [branch]
+
+
+				collaboration workflow
+
+					Me
+
+						make sure I'm in my master branch: git checkout master
+
+						fetch all possible changes from remote repo: git fetch
+
+							note, I see that my colleagues have made changes to the project and have created new commits
+
+						now I merge all those changes into my origin/master branch: git merge origin/master
+
+						I'm going to start working on my new feature on a separate branch (made as identical to my master branch):  git checkout -b feedback_form
+
+							I add a page called feedback.html
+
+						I've finished my work, now I commit the changes to the branch
+
+						I want my colleagues to see the work I've done on this feedback form. But before I push, I do a git fetch again to find out if there have been any more commits since I started working that need to be taken into considertation. If so, I need to determine whether or not I need to bring them into my feedback branch or not. In this example, there were no other commits on master.
+
+						Now I can push my branch up to remote: git push -u origin feedback_form
+
+						I email my colleague to ask for his point of view of my branch
+
+					Colleague
+
+						gets on master branch: git checkout master
+
+						updates her origin/master so that she can see the branch that I added: git fetch
+
+						see the new branch: git branch -r
+
+						he now knows the name of the branch I created that is still sitting on the remote
+
+						he creates a new branch that starts from the point of branch end: git checkout -b feedback_form origin/feedback_form
+
+						he wants to see the work that I did, so he runs: git log
+
+						then he wants to take a deeper look at the commit, so: git show [SHA]
+
+						he adds a new feature on top of the feature that I added. THen commits: git commit -am "add tour selector to feedback form"
+
+						he runs another: git fetch
+
+						then runs a git push
+
+						he emails me to tell me he added one change on top of my change
+
+					me
+
+						I receive email letting me know changes have been made to my new branch
+
+						I run git fetch
+
+						I take a look at his changes (show the login tree with a diff of all the changes made in that login tree, the differences from my feedback_form branch to the newly fetched version from the remote): git log -p feedback_form..origin/feedback_form
+
+						I like the changes so I'm going to now merge them into my feedback branch: git merge origin/feedback_form
+
+							note, in this instance it's a fast-forward merge
+
+						I decide to call this feature finished and fold it into the master branch
+
+							git fetch to double check and make sure there are no new changes. If there have been: git merge origin/master (if I want to merge in those changes)
+
+							git merge feedback_form
+
+							git push (now my work combined with colleagues work is up and on remote)
+
+		terminal optimizations
+
+			set up password caching
+
+		note, many IDEs or other editors may have git support built in
