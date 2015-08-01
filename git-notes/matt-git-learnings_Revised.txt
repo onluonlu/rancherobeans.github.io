@@ -1,6 +1,6 @@
-High Level Notes!!! (test edit from GitHub web interface - back up)
+High Level Notes!!!
 
-	git is known as a Version Control System (VCS) - best at tracking changes in text documents
+	git is known as a Distributed Version Control System (VCS) - best at tracking changes in text documents
 
 	concurrent Version System (CVS) - was prior to other subsequent VSCs and Git. Users loaded a master repository to a remote server, then changes would be submitted back to the central repo (it’s up to users to keep up to date/pull down whatever is being changed in that central repo)
 
